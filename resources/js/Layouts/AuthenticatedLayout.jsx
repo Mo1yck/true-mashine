@@ -30,6 +30,24 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+
+                                {/* Пункты для админа */}
+                                {user.role === 'admin' && (
+                                    <>
+                                        <NavLink
+                                            href="/admin/users"
+                                            active={route().current('admin.users.*')}
+                                        >
+                                            Пользователи
+                                        </NavLink>
+                                        <NavLink
+                                            href="/admin/technologies"
+                                            active={route().current('admin.technologies.*')}
+                                        >
+                                            Технологии
+                                        </NavLink>
+                                    </>
+                                )}
                             </div>
                         </div>
 
@@ -134,6 +152,24 @@ export default function AuthenticatedLayout({ header, children }) {
                         >
                             Dashboard
                         </ResponsiveNavLink>
+
+                        {/* Пункты для админа (мобильное меню) */}
+                        {user.role === 'admin' && (
+                            <>
+                                <ResponsiveNavLink
+                                    href="/admin/users"
+                                    active={route().current('admin.users.*')}
+                                >
+                                    Пользователи
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href="/admin/technologies"
+                                    active={route().current('admin.technologies.*')}
+                                >
+                                    Технологии
+                                </ResponsiveNavLink>
+                            </>
+                        )}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
