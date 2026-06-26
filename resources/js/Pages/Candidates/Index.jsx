@@ -1,7 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 export default function Index({ auth, candidates }) {
+    const deleteCandidate = (id) => {
+        if (confirm('Удалить кандидата? Это действие необратимо.')) {
+            router.delete(`/candidates/${id}`);
+        }
+    };
+
+    const canManage = auth.user.role === 'admin' || auth.user.role === 'manager';
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -13,12 +21,14 @@ export default function Index({ auth, candidates }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6">
-                            <Link
-                                href="/candidates/create"
-                                className="inline-block bg-blue-500 text-white px-4 py-2 rounded mb-4"
-                            >
-                                + Загрузить резюме
-                            </Link>
+                            {canManage && (
+                                <Link
+                                    href="/candidates/create"
+                                    className="inline-block bg-blue-500 text-white px-4 py-2 rounded mb-4"
+                                >
+                                    + Загрузить резюме
+                                </Link>
+                            )}
 
                             <table className="w-full border-collapse">
                                 <thead>
@@ -40,9 +50,21 @@ export default function Index({ auth, candidates }) {
                                             <td className="p-2">{candidate.skills?.length || 0}</td>
                                             <td className="p-2">{candidate.status}</td>
                                             <td className="p-2">
-                                                <Link href={`/candidates/${candidate.id}`} className="text-blue-600">
+                                                <Link
+                                                    href={`/candidates/${candidate.id}`}
+                                                    className="text-blue-600 mr-2"
+                                                >
                                                     Просмотр
                                                 </Link>
+
+                                                {auth.user.role === 'admin' && (
+                                                    <button
+                                                        onClick={() => deleteCandidate(candidate.id)}
+                                                        className="text-red-600 hover:underline"
+                                                    >
+                                                        Удалить
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

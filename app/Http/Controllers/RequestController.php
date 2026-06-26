@@ -153,4 +153,21 @@ class RequestController extends Controller
 
         return redirect()->route('requests.index')->with('success', 'Запрос удалён');
     }
+    
+    public function candidates($id)
+{
+    $request = Request::with(['candidates' => function ($query) {
+        $query->with('candidateSkills.technology', 'uploadedBy');
+    }])->findOrFail($id);
+
+    // Сортируем кандидатов по проценту (по убыванию)
+    $candidates = $request->candidates
+        ->sortByDesc('match_score')
+        ->values();
+
+    return Inertia::render('Requests/Candidates', [
+        'request' => $request,
+        'candidates' => $candidates,
+    ]);
+}
 }

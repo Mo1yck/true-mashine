@@ -8,6 +8,8 @@ export default function Index({ auth, requests }) {
         closed: 'bg-red-200',
     };
 
+    const canManage = auth.user.role === 'admin' || auth.user.role === 'manager';
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -19,12 +21,14 @@ export default function Index({ auth, requests }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6">
-                            <Link
-                                href="/requests/create"
-                                className="inline-block bg-blue-500 text-white px-4 py-2 rounded mb-4"
-                            >
-                                + Создать запрос
-                            </Link>
+                            {canManage && (
+                                <Link
+                                    href="/requests/create"
+                                    className="inline-block bg-blue-500 text-white px-4 py-2 rounded mb-4"
+                                >
+                                    + Создать запрос
+                                </Link>
+                            )}
 
                             <table className="w-full border-collapse">
                                 <thead>
@@ -55,8 +59,18 @@ export default function Index({ auth, requests }) {
                                                 <Link href={`/requests/${req.id}`} className="text-blue-600 mr-2">
                                                     Просмотр
                                                 </Link>
-                                                <Link href={`/requests/${req.id}/edit`} className="text-green-600 mr-2">
-                                                    Редактировать
+
+                                                {canManage && (
+                                                    <Link href={`/requests/${req.id}/edit`} className="text-green-600 mr-2">
+                                                        Редактировать
+                                                    </Link>
+                                                )}
+
+                                                <Link
+                                                    href={`/requests/${req.id}/candidates`}
+                                                    className="text-purple-600"
+                                                >
+                                                    Кандидаты
                                                 </Link>
                                             </td>
                                         </tr>

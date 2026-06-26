@@ -143,4 +143,24 @@ public function match($id)
     return redirect()->route('candidates.show', $candidate->id)
         ->with('success', 'Сверка выполнена! Покрытие: ' . $assessment->total_score . '%');
 }
+
+
+public function destroy($id)
+{
+    $candidate = Candidate::findOrFail($id);
+
+    // Удаляем файл с диска
+    if (Storage::disk('public')->exists($candidate->file_path)) {
+        Storage::disk('public')->delete($candidate->file_path);
+    }
+
+    // Удаляем связанные данные
+    $candidate->candidateSkills()->delete();
+    if ($candidate->assessment) {
+        $candidate->assessment()->delete();
+    }
+    $candidate->delete();
+
+    return redirect()->route('candidates.index')->with('success', 'Кандидат удалён');
+}
 }

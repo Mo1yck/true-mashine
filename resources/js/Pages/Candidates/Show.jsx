@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 
 export default function Show({ auth, candidate }) {
     const runMatch = () => {
@@ -8,7 +8,16 @@ export default function Show({ auth, candidate }) {
         }
     };
 
+    const deleteCandidate = () => {
+        if (confirm('Удалить кандидата? Это действие необратимо.')) {
+            router.delete(`/candidates/${candidate.id}`);
+        }
+    };
+
     const assessment = candidate.assessment;
+    const isDirectorOrAdmin = auth.user.role === 'director' || auth.user.role === 'admin';
+    const isAdmin = auth.user.role === 'admin';
+    const canManage = auth.user.role === 'admin' || auth.user.role === 'manager';
 
     return (
         <AuthenticatedLayout
@@ -50,14 +59,34 @@ export default function Show({ auth, candidate }) {
                                     </div>
                                 </div>
 
-                                {/* Кнопка сверки */}
-                                <div>
-                                    <button
-                                        onClick={runMatch}
-                                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                                    >
-                                        🚀 Запустить сверку
-                                    </button>
+                                {/* Кнопки действий */}
+                                <div className="flex flex-wrap gap-2">
+                                    {canManage && (
+                                        <button
+                                            onClick={runMatch}
+                                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                                        >
+                                            🚀 Запустить сверку
+                                        </button>
+                                    )}
+
+                                    {isDirectorOrAdmin && (
+                                        <button
+                                            onClick={() => window.location.href = `/report/candidate/${candidate.id}`}
+                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                        >
+                                            📄 Скачать отчёт PDF
+                                        </button>
+                                    )}
+
+                                    {isAdmin && (
+                                        <button
+                                            onClick={deleteCandidate}
+                                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                                        >
+                                            🗑️ Удалить кандидата
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Результаты сверки */}
