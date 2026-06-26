@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CandidateController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -34,6 +35,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
 Route::middleware(['auth', 'role:admin,manager'])->group(function () {
     Route::resource('requests', RequestController::class);
+    Route::resource('candidates', CandidateController::class);
+    Route::post('/candidates/{id}/match', [CandidateController::class, 'match'])->name('candidates.match');
 });
 
 require __DIR__.'/auth.php';

@@ -12,13 +12,11 @@ class CandidateSkill extends Model
         'source_context',
     ];
 
-    // Связь: навык принадлежит кандидату
     public function candidate()
     {
         return $this->belongsTo(Candidate::class);
     }
 
-    // Связь: навык привязан к технологии
     public function technology()
     {
         return $this->belongsTo(Technology::class);

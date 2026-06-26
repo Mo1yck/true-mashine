@@ -23,27 +23,29 @@ class Candidate extends Model
         'parsed_data' => 'array',
     ];
 
-    // Связь: кандидат принадлежит запросу
     public function request()
     {
         return $this->belongsTo(Request::class);
     }
 
-    // Связь: у кандидата много навыков
     public function candidateSkills()
     {
         return $this->hasMany(CandidateSkill::class);
     }
 
-    // Связь: кандидата загрузил пользователь
     public function uploadedBy()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    // Связь: у кандидата много результатов сверки
     public function assessments()
     {
         return $this->hasMany(Assessment::class);
+    }
+
+    // ДОБАВЬ ЭТОТ МЕТОД:
+    public function assessment()
+    {
+        return $this->hasOne(Assessment::class);
     }
 }
