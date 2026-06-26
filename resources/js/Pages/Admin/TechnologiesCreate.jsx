@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function TechnologiesCreate({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -30,87 +30,107 @@ export default function TechnologiesCreate({ auth }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="text-xl font-semibold">Добавить технологию</h2>}
+            header={<h2 className="text-xl font-semibold text-[#2D0094]">Добавить технологию</h2>}
         >
             <Head title="Добавить технологию" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6">
-                            <form onSubmit={submit} className="space-y-4 max-w-md">
-                                <div>
-                                    <label className="block font-medium">Название*</label>
+            <div className="py-8">
+                <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
+                        <form onSubmit={submit} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-[#1A0033] mb-1">
+                                    Название <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    className="w-full rounded-xl border-gray-300 px-4 py-2.5 focus:border-[#2D0094] focus:ring-[#2D0094] transition-all"
+                                    placeholder="Например: PHP, Laravel, Docker"
+                                />
+                                {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name}</div>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-[#1A0033] mb-1">
+                                    Группа
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.group}
+                                    onChange={(e) => setData('group', e.target.value)}
+                                    className="w-full rounded-xl border-gray-300 px-4 py-2.5 focus:border-[#2D0094] focus:ring-[#2D0094] transition-all"
+                                    placeholder="Например: Языки, Фреймворки, Базы данных, DevOps"
+                                />
+                                {errors.group && <div className="text-red-500 text-sm mt-1">{errors.group}</div>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-[#1A0033] mb-1">
+                                    Синонимы
+                                </label>
+                                <div className="flex gap-2">
                                     <input
                                         type="text"
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
-                                        className="w-full border rounded px-3 py-2"
+                                        value={synonymInput}
+                                        onChange={(e) => setSynonymInput(e.target.value)}
+                                        className="flex-1 rounded-xl border-gray-300 px-4 py-2.5 focus:border-[#2D0094] focus:ring-[#2D0094] transition-all"
+                                        placeholder="Например: postgres, pgsql"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                addSynonym();
+                                            }
+                                        }}
                                     />
-                                    {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
+                                    <button
+                                        type="button"
+                                        onClick={addSynonym}
+                                        className="bg-[#2D0094] hover:bg-[#5B2BD4] text-white px-4 py-2.5 rounded-xl font-medium transition-colors"
+                                    >
+                                        +
+                                    </button>
                                 </div>
 
-                                <div>
-                                    <label className="block font-medium">Группа</label>
-                                    <input
-                                        type="text"
-                                        value={data.group}
-                                        onChange={(e) => setData('group', e.target.value)}
-                                        className="w-full border rounded px-3 py-2"
-                                        placeholder="например: языки, фреймворки, базы данных"
-                                    />
-                                    {errors.group && <div className="text-red-500 text-sm">{errors.group}</div>}
-                                </div>
-
-                                <div>
-                                    <label className="block font-medium">Синонимы</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={synonymInput}
-                                            onChange={(e) => setSynonymInput(e.target.value)}
-                                            className="flex-1 border rounded px-3 py-2"
-                                            placeholder="например: postgres, pgsql"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={addSynonym}
-                                            className="bg-gray-200 px-4 py-2 rounded"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                    {data.synonyms.length > 0 && (
-                                        <div className="mt-2 flex flex-wrap gap-2">
-                                            {data.synonyms.map((syn, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded flex items-center gap-1"
+                                {data.synonyms.length > 0 && (
+                                    <div className="mt-3 flex flex-wrap gap-2">
+                                        {data.synonyms.map((syn, index) => (
+                                            <span
+                                                key={index}
+                                                className="bg-purple-100 text-[#2D0094] px-3 py-1.5 rounded-xl text-sm font-medium flex items-center gap-1.5"
+                                            >
+                                                {syn}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSynonym(index)}
+                                                    className="text-red-500 hover:text-red-700 font-bold ml-1"
                                                 >
-                                                    {syn}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeSynonym(index)}
-                                                        className="text-red-500 font-bold"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
-                                    {errors.synonyms && <div className="text-red-500 text-sm">{errors.synonyms}</div>}
-                                </div>
+                                                    ×
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                                {errors.synonyms && <div className="text-red-500 text-sm mt-1">{errors.synonyms}</div>}
+                            </div>
 
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                                <Link
+                                    href="/admin/technologies"
+                                    className="px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+                                >
+                                    Отмена
+                                </Link>
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="bg-blue-500 text-black px-4 py-2 rounded hover:bg-blue-600"
+                                    className="bg-[#2D0094] hover:bg-[#5B2BD4] text-white px-6 py-2.5 rounded-xl font-medium shadow-lg shadow-purple-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Сохранить
+                                    {processing ? 'Сохранение...' : 'Сохранить'}
                                 </button>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
