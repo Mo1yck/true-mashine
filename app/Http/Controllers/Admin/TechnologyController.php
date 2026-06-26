@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Technology;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Traits\LogsActivity;
 
 class TechnologyController extends Controller
 {
+    use LogsActivity;
+
     // Список технологий
     public function index()
     {
@@ -32,11 +35,13 @@ class TechnologyController extends Controller
             'synonyms.*' => 'string|max:255',
         ]);
 
-        Technology::create([
+        $technology = Technology::create([
             'name' => $request->name,
             'group' => $request->group,
             'synonyms' => $request->synonyms,
         ]);
+
+        $this->logActivity('created', $technology, null, $technology->toArray());
 
         return redirect()->route('admin.technologies.index')->with('success', 'Технология создана');
     }
@@ -52,6 +57,7 @@ class TechnologyController extends Controller
     public function update(Request $request, $id)
     {
         $technology = Technology::findOrFail($id);
+        $old = $technology->toArray();
 
         $request->validate([
             'name' => 'required|string|max:255|unique:technologies,name,' . $technology->id,
@@ -66,6 +72,9 @@ class TechnologyController extends Controller
             'synonyms' => $request->synonyms,
         ]);
 
+        $new = $technology->toArray();
+        $this->logActivity('updated', $technology, $old, $new);
+
         return redirect()->route('admin.technologies.index')->with('success', 'Технология обновлена');
     }
 
@@ -73,7 +82,11 @@ class TechnologyController extends Controller
     public function destroy($id)
     {
         $technology = Technology::findOrFail($id);
+        $old = $technology->toArray();
+
         $technology->delete();
+
+        $this->logActivity('deleted', null, $old, null);
 
         return redirect()->route('admin.technologies.index')->with('success', 'Технология удалена');
     }

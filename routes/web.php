@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CandidateController;
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('admin.audit-logs.index');
 
     Route::resource('technologies', TechnologyController::class)->names('admin.technologies');
 });

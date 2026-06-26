@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 export default function Index({ auth, requests }) {
     const statusColors = {
@@ -9,6 +9,12 @@ export default function Index({ auth, requests }) {
     };
 
     const canManage = auth.user.role === 'admin' || auth.user.role === 'manager';
+
+    const deleteRequest = (id) => {
+        if (confirm('Удалить запрос? Это действие необратимо.')) {
+            router.delete(`/requests/${id}`);
+        }
+    };
 
     return (
         <AuthenticatedLayout
@@ -61,14 +67,22 @@ export default function Index({ auth, requests }) {
                                                 </Link>
 
                                                 {canManage && (
-                                                    <Link href={`/requests/${req.id}/edit`} className="text-green-600 mr-2">
-                                                        Редактировать
-                                                    </Link>
+                                                    <>
+                                                        <Link href={`/requests/${req.id}/edit`} className="text-green-600 mr-2">
+                                                            Редактировать
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => deleteRequest(req.id)}
+                                                            className="text-red-600 hover:underline"
+                                                        >
+                                                            Удалить
+                                                        </button>
+                                                    </>
                                                 )}
 
                                                 <Link
                                                     href={`/requests/${req.id}/candidates`}
-                                                    className="text-purple-600"
+                                                    className="text-purple-600 ml-2"
                                                 >
                                                     Кандидаты
                                                 </Link>

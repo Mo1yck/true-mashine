@@ -31,7 +31,23 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Dashboard
                                 </NavLink>
 
-                                {/* Пункты для админа */}
+                                {/* Запросы — для всех авторизованных */}
+                                <NavLink
+                                    href="/requests"
+                                    active={route().current('requests.*')}
+                                >
+                                    Запросы
+                                </NavLink>
+
+                                {/* Кандидаты — для всех авторизованных */}
+                                <NavLink
+                                    href="/candidates"
+                                    active={route().current('candidates.*')}
+                                >
+                                    Кандидаты
+                                </NavLink>
+
+                                {/* Пункты только для админа */}
                                 {user.role === 'admin' && (
                                     <>
                                         <NavLink
@@ -45,6 +61,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                             active={route().current('admin.technologies.*')}
                                         >
                                             Технологии
+                                        </NavLink>
+                                        <NavLink
+                                            href="/admin/audit-logs"
+                                            active={route().current('admin.audit-logs.*')}
+                                        >
+                                            📋 Журнал
                                         </NavLink>
                                     </>
                                 )}
@@ -153,6 +175,20 @@ export default function AuthenticatedLayout({ header, children }) {
                             Dashboard
                         </ResponsiveNavLink>
 
+                        <ResponsiveNavLink
+                            href="/requests"
+                            active={route().current('requests.*')}
+                        >
+                            Запросы
+                        </ResponsiveNavLink>
+
+                        <ResponsiveNavLink
+                            href="/candidates"
+                            active={route().current('candidates.*')}
+                        >
+                            Кандидаты
+                        </ResponsiveNavLink>
+
                         {/* Пункты для админа (мобильное меню) */}
                         {user.role === 'admin' && (
                             <>
@@ -167,6 +203,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     active={route().current('admin.technologies.*')}
                                 >
                                     Технологии
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href="/admin/audit-logs"
+                                    active={route().current('admin.audit-logs.*')}
+                                >
+                                    📋 Журнал
                                 </ResponsiveNavLink>
                             </>
                         )}

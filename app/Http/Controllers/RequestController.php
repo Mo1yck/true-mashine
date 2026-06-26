@@ -6,9 +6,12 @@ use App\Models\Request;
 use App\Models\Technology;
 use Illuminate\Http\Request as HttpRequest;
 use Inertia\Inertia;
+use App\Traits\LogsActivity;
 
 class RequestController extends Controller
 {
+    use LogsActivity;
+
     // Список запросов
     public function index()
     {
@@ -68,6 +71,8 @@ class RequestController extends Controller
             ]);
         }
 
+        $this->logActivity('created', $newRequest, null, $newRequest->toArray());
+
         return redirect()->route('requests.index')->with('success', 'Запрос создан');
     }
 
@@ -96,6 +101,7 @@ class RequestController extends Controller
     public function update(HttpRequest $request, $id)
     {
         $existingRequest = Request::findOrFail($id);
+        $old = $existingRequest->toArray();
 
         $request->validate([
             'position' => 'required|string|max:255',
@@ -135,6 +141,9 @@ class RequestController extends Controller
             ]);
         }
 
+        $new = $existingRequest->fresh()->toArray();
+        $this->logActivity('updated', $existingRequest, $old, $new);
+
         return redirect()->route('requests.index')->with('success', 'Запрос обновлён');
     }
 
@@ -142,6 +151,7 @@ class RequestController extends Controller
     public function destroy($id)
     {
         $request = Request::findOrFail($id);
+        $old = $request->toArray();
 
         // Проверяем, есть ли у запроса кандидаты
         if ($request->candidates()->count() > 0) {
@@ -151,23 +161,26 @@ class RequestController extends Controller
         $request->requirements()->delete();
         $request->delete();
 
+        $this->logActivity('deleted', null, $old, null);
+
         return redirect()->route('requests.index')->with('success', 'Запрос удалён');
     }
-    
+
+    // Кандидаты по запросу
     public function candidates($id)
-{
-    $request = Request::with(['candidates' => function ($query) {
-        $query->with('candidateSkills.technology', 'uploadedBy');
-    }])->findOrFail($id);
+    {
+        $request = Request::with(['candidates' => function ($query) {
+            $query->with('candidateSkills.technology', 'uploadedBy');
+        }])->findOrFail($id);
 
-    // Сортируем кандидатов по проценту (по убыванию)
-    $candidates = $request->candidates
-        ->sortByDesc('match_score')
-        ->values();
+        // Сортируем кандидатов по проценту (по убыванию)
+        $candidates = $request->candidates
+            ->sortByDesc('match_score')
+            ->values();
 
-    return Inertia::render('Requests/Candidates', [
-        'request' => $request,
-        'candidates' => $candidates,
-    ]);
-}
+        return Inertia::render('Requests/Candidates', [
+            'request' => $request,
+            'candidates' => $candidates,
+        ]);
+    }
 }

@@ -7,9 +7,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use App\Traits\LogsActivity;
 
 class UserController extends Controller
 {
+    use LogsActivity;
+
     // Список пользователей
     public function index()
     {
@@ -33,12 +36,14 @@ class UserController extends Controller
             'role' => 'required|in:admin,manager,director',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
+
+        $this->logActivity('created', $user, null, $user->toArray());
 
         return redirect()->route('admin.users.index')->with('success', 'Пользователь создан');
     }
@@ -55,6 +60,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $currentUser = auth()->user();
+        $old = $user->toArray();
 
         // Если не админ — редактирует только себя
         if ($currentUser->role !== 'admin' && $currentUser->id !== $user->id) {
@@ -90,6 +96,9 @@ class UserController extends Controller
         }
 
         $user->update($data);
+        $new = $user->toArray();
+
+        $this->logActivity('updated', $user, $old, $new);
 
         return redirect()->route('admin.users.index')->with('success', 'Пользователь обновлён');
     }
@@ -99,6 +108,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $currentUser = auth()->user();
+        $old = $user->toArray();
 
         // Только админ может удалять
         if ($currentUser->role !== 'admin') {
@@ -114,6 +124,8 @@ class UserController extends Controller
         }
 
         $user->delete();
+
+        $this->logActivity('deleted', null, $old, null);
 
         return redirect()->route('admin.users.index')->with('success', 'Пользователь удалён');
     }
